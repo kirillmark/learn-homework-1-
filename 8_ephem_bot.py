@@ -13,21 +13,14 @@
 
 """
 import logging
+import ephem
+
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO,
-                    filename='bot.log')
+import settings
 
-
-PROXY = {
-    'proxy_url': 'socks5://t1.learn.python.ru:1080',
-    'urllib3_proxy_kwargs': {
-        'username': 'learn',
-        'password': 'python'
-    }
-}
+logging.basicConfig(filename='bot2.log', level=logging.INFO)
 
 
 def greet_user(update, context):
@@ -36,17 +29,49 @@ def greet_user(update, context):
     update.message.reply_text(text)
 
 
+def say_planet(update, context):
+    user_text = update.message.text
+    planet = user_text.split()[1]
+    if planet == 'Mercury':
+        merc = ephem.Mercury('2024/23/05')
+        constellation = ephem.constellation(merc)
+        update.message.reply_text(constellation[1])
+    if planet == 'Venus':
+        ven = ephem.Venus('2024/23/05')
+        constellation = ephem.constellation(ven)
+        update.message.reply_text(constellation[1])
+    if planet == 'Mars':
+        mars = ephem.Mars('2024/23/05')
+        constellation = ephem.constellation(mars)
+        update.message.reply_text(constellation[1])
+    if planet == 'Jupiter':
+        jup = ephem.Jupiter('2024/23/05')
+        constellation = ephem.constellation(jup)
+        update.message.reply_text(constellation[1])
+    if planet == 'Saturn':
+        satu = ephem.Saturn('2024/23/05')
+        constellation = ephem.constellation(satu)
+        update.message.reply_text(constellation[1])
+    if planet == 'Neptune':
+        nep = ephem.Neptune('2024/23/05')
+        constellation = ephem.constellation(nep)
+        update.message.reply_text(constellation[1])
+    else:
+        update.message.reply_text('Введите правильное название планеты')
+
+
 def talk_to_me(update, context):
     user_text = update.message.text
     print(user_text)
-    update.message.reply_text(text)
+    update.message.reply_text(user_text)
 
 
 def main():
-    mybot = Updater("КЛЮЧ, КОТОРЫЙ НАМ ВЫДАЛ BotFather", request_kwargs=PROXY, use_context=True)
+    mybot = Updater(settings.API_KEY, use_context=True)
 
     dp = mybot.dispatcher
     dp.add_handler(CommandHandler("start", greet_user))
+    dp.add_handler(CommandHandler("planet", say_planet))
     dp.add_handler(MessageHandler(Filters.text, talk_to_me))
 
     mybot.start_polling()
